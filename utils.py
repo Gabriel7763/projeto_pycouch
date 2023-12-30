@@ -61,19 +61,63 @@ def inserir():
     """
     Função para inserir um produto
     """  
-    print('Inserindo produto...')
+    db = conectar()
+
+    if db:
+        nome = input('Informe nome do produto: ')
+        preco = float(input('Informe o preço do produto: '))
+        estoque = int(input('Informe o estoque: '))
+
+        produto = {"nome": nome, "preco": preco, "estoque": estoque}
+
+        res = db.save(produto)
+
+        if res:
+            print(f'O produto {nome} foi inserido com sucesso')
+        else:
+            print('O produto não foi salvo')
+    else:
+        print('Não foi possível conectar ao servidor')
 
 def atualizar():
     """
     Função para atualizar um produto
     """
-    print('Atualizando produto...')
+    db = conectar()
+
+    if db:
+        chave = input('Informe o id do produto: ')
+        try:
+            doc = db[chave]
+            nome = input('Informe o nome do produto: ')
+            preco = float(input('Informe o preço: '))
+            estoque = int(input('Informe o estoque: '))
+
+            doc['nome'] = nome
+            doc['preco'] = preco
+            doc['estoque'] = estoque
+            db[doc.id] = doc
+            print(f'O produto {nome} foi atualizado com sucesso')
+        except couchdb.http.ResourceNotFound as e:
+            print(f'Produto não encontrado: {e}')
+    else:
+        print('Não foi possível conectar ao servidor')
 
 def deletar():
     """
     Função para deletar um produto
     """  
-    print('Deletando produto...')
+    db = conectar()
+
+    if db:
+        _id = input('Informe o ID do produto: ')
+        try:
+            db.delete(db[_id])
+            print('Produto deletado com sucesso')
+        except couchdb.http.ResourceNotFound as e:
+            print(f'Não foi possível deletar o produto: {e}')
+    else:
+        print('Erro ao conectar ao servidor')
 
 def menu():
     """
